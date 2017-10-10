@@ -4,6 +4,7 @@ set.seed (10)
 #
 library(plyr)
 Data = read.csv("Concrete_Data.csv")
+
 head(Data)
 # rename colum and show the plot
 myData<-rename(Data, c("Cement..component.1..kg.in.a.m.3.mixture."="x1",
@@ -137,7 +138,7 @@ grid()
 library(MASS)
 lm.ridge <- lm.ridge(formula=y~.,data=trainData,lambda=seq(from=0,to=300,by=1))
 #lm.ridge$coef
-
+plot(lm.ridge)
 #plot this information
 while("draw plot"!=0){
   matplot(x=t(lm.ridge$coef),type='s',
@@ -156,3 +157,60 @@ while("draw plot"!=0){
 
 ####################################################################################################
 #Model 5  	 Self-selet model: elastic net 
+library(glmnet)
+train.mat<-model.matrix(y~.,trainData)[,-1]
+train.mat
+lm.elnet <- glmnet(train.mat, trainData$y, family="gaussian", alpha=.3)
+plot(lm.elnet)
+lm.elnet
+y_train<-predict(lm.elnet, s=0,newx=train.mat)
+rmse <- sqrt(mean((trainData$y - y_train)^2))
+rmse
+fit0$lambda.1se
+
+for (i in 0:10) {
+  assign(paste("fit", i, sep=""), cv.glmnet(train.mat, trainData$y, type.measure="mse", 
+                                            alpha=i/10,family="gaussian"))
+}
+par(mfrow=c(1,1))
+# For plotting options, type '?plot.glmnet' in R console
+
+
+plot(fit.elnet, xvar="lambda")
+plot(fit5, main="Elastic Net")
+
+findrmse=function(train.mat,trainData,...){
+    
+  
+  yhat0 <- predict(fit0, s=fit0$lambda.1se, newx=train.mat)
+  yhat1 <- predict(fit1, s=fit1$lambda.1se, newx=train.mat)
+  yhat2 <- predict(fit2, s=fit2$lambda.1se, newx=train.mat)
+  yhat3 <- predict(fit3, s=fit3$lambda.1se, newx=train.mat)
+  yhat4 <- predict(fit4, s=fit4$lambda.1se, newx=train.mat)
+  yhat5 <- predict(fit5, s=fit5$lambda.1se, newx=train.mat)
+  yhat6 <- predict(fit6, s=fit6$lambda.1se, newx=train.mat)
+  yhat7 <- predict(fit7, s=fit7$lambda.1se, newx=train.mat)
+  yhat8 <- predict(fit8, s=fit8$lambda.1se, newx=train.mat)
+  yhat9 <- predict(fit9, s=fit9$lambda.1se, newx=train.mat)
+  yhat10 <- predict(fit10, s=fit10$lambda.1se, newx=train.mat)
+  
+  mse0 <- sqrt(mean((trainData$y - yhat0)^2))
+  mse1 <- sqrt(mean((trainData$y - yhat1)^2))
+  mse2 <- sqrt(mean((trainData$y - yhat2)^2))
+  mse3 <- sqrt(mean((trainData$y - yhat3)^2))
+  mse4 <- sqrt(mean((trainData$y - yhat4)^2))
+  mse5 <- sqrt(mean((trainData$y - yhat5)^2))
+  mse6 <- sqrt(mean((trainData$y - yhat6)^2))
+  mse7 <- sqrt(mean((trainData$y - yhat7)^2))
+  mse8 <- sqrt(mean((trainData$y - yhat8)^2))
+  mse9 <- sqrt(mean((trainData$y - yhat9)^2))
+  mse10 <- sqrt(mean((trainData$y - yhat10)^2))
+  y=c(mse0,mse1,mse2,mse3,mse4,mse5,mse6,mse7,mse8,mse9,mse10)
+  print(y)
+  plot(x=c(0:10),y,type="b")
+}
+
+y
+
+test.mat<-model.matrix(y~.,testData)[,-1]
+findrmse(test.mat,testData)
