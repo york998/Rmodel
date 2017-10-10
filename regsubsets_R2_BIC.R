@@ -1,0 +1,13 @@
+library(ISLR)
+library(knitr)
+library(printr)
+str(Hitters)
+print(summary(Hitters))
+sum(is.na(Hitters$Salary))
+Hitters=na.omit(Hitters)
+sum(is.na(Hitters))
+library(leaps)
+regfit.full = regsubsets(Salary ~ ., data = Hitters, nvmax = 19)
+reg.summary = summary(regfit.full)
+names(reg.summary)
+reg.summary$bic
